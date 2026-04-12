@@ -1,71 +1,73 @@
 import networkx as nx
 import numpy as np
 
+
 class SmartCityGraph:
-    def __init__(self, num_traffic, num_energy):
+    def __init__(self, num_traffic, num_energy, seed=7):
         self.num_traffic = num_traffic
         self.num_energy = num_energy
+        self.seed = seed
+        self.rng = np.random.default_rng(seed)
         self.G = nx.Graph()
-        
+
         self.traffic_nodes = []
         self.energy_nodes = []
-        
+
         self._build_graph()
-    
+
     def _build_graph(self):
-        # Traffic nodes
         for i in range(self.num_traffic):
             node_id = f"T{i}"
-            self.G.add_node(node_id, type='traffic')
+            self.G.add_node(node_id, type="traffic")
             self.traffic_nodes.append(node_id)
-        
-        # Energy nodes
+
         for i in range(self.num_energy):
             node_id = f"E{i}"
-            self.G.add_node(node_id, type='energy')
+            self.G.add_node(node_id, type="energy")
             self.energy_nodes.append(node_id)
-        
-        # Traffic edges
+
         for i in range(self.num_traffic - 1):
-            self.G.add_edge(self.traffic_nodes[i], self.traffic_nodes[i+1], type='traffic')
-        
-        for _ in range(self.num_traffic):
-            a, b = np.random.choice(self.traffic_nodes, 2, replace=False)
-            self.G.add_edge(a, b, type='traffic')
-        
-        # Energy edges
+            self.G.add_edge(self.traffic_nodes[i], self.traffic_nodes[i + 1], type="traffic")
+
+        extra_edges = max(1, self.num_traffic // 2)
+        for _ in range(extra_edges):
+            a, b = self.rng.choice(self.traffic_nodes, 2, replace=False)
+            self.G.add_edge(a, b, type="traffic")
+
         for i in range(self.num_energy - 1):
-            self.G.add_edge(self.energy_nodes[i], self.energy_nodes[i+1], type='energy')
-        
-        # Cross-domain edges
-        for e in self.energy_nodes:
-            connected_traffic = np.random.choice(self.traffic_nodes, size=3, replace=False)
-            for t in connected_traffic:
-                self.G.add_edge(t, e, type='cross')
-    
+            self.G.add_edge(self.energy_nodes[i], self.energy_nodes[i + 1], type="energy")
+
+        for index, energy_node in enumerate(self.energy_nodes):
+            anchor = index % len(self.traffic_nodes)
+            traffic_choices = self.traffic_nodes[anchor:] + self.traffic_nodes[:anchor]
+            for traffic_node in traffic_choices[: min(3, len(traffic_choices))]:
+                self.G.add_edge(traffic_node, energy_node, type="cross")
+
     def get_neighbors(self, node, edge_type=None):
         neighbors = []
-        for nbr in self.G.neighbors(node):
-            if edge_type:
-                if self.G[node][nbr]['type'] == edge_type:
-                    neighbors.append(nbr)
-            else:
-                neighbors.append(nbr)
+        for neighbor in self.G.neighbors(node):
+            if edge_type is None or self.G[node][neighbor]["type"] == edge_type:
+                neighbors.append(neighbor)
         return neighbors
-    def to_edge_index(self):
+
+    def get_node_list(self, include_energy=True):
+        return self.traffic_nodes + (self.energy_nodes if include_energy else [])
+
+    def to_edge_index(self, include_energy=True):
         import torch
 
-        # ✅ include BOTH traffic + energy
-        node_list = self.traffic_nodes + self.energy_nodes
+        node_list = self.get_node_list(include_energy=include_energy)
         node_to_idx = {node: i for i, node in enumerate(node_list)}
-
         edges = []
 
-        for u, v, data in self.G.edges(data=True):
+        for u, v, _ in self.G.edges(data=True):
             if u in node_to_idx and v in node_to_idx:
                 edges.append([node_to_idx[u], node_to_idx[v]])
                 edges.append([node_to_idx[v], node_to_idx[u]])
 
-        edge_index = torch.tensor(edges, dtype=torch.long).t()
+        if not edges:
+            edge_index = torch.empty((2, 0), dtype=torch.long)
+        else:
+            edge_index = torch.tensor(edges, dtype=torch.long).t().contiguous()
 
         return edge_index, node_to_idx

@@ -1,62 +1,239 @@
-from graph.graph_builder import SmartCityGraph
-from simulation.digital_twin import DigitalTwin
-from config.config import *
-import matplotlib.pyplot as plt
+import json
+from pathlib import Path
+
 import numpy as np
 
-def run_scenario(alpha):
-    graph = SmartCityGraph(NUM_TRAFFIC_NODES, NUM_ENERGY_NODES)
-    twin = DigitalTwin(graph, alpha, W1, W2)
-    
-    history = twin.run(TIME_STEPS)
-    
-    travel = np.mean([h[0] for h in history])
-    energy = np.mean([h[1] for h in history])
-    
-    return travel, energy
-def plot_results(results):
-    labels = list(results.keys())
-    travel = [v[0] for v in results.values()]
-    energy = [v[1] for v in results.values()]
-    
-    x = range(len(labels))
-    
-    plt.figure()
-    plt.bar(x, travel)
-    plt.xticks(x, labels)
-    plt.title("Travel Time Comparison")
-    plt.ylabel("Travel Time")
-    plt.show()
-    
-    plt.figure()
-    plt.bar(x, energy)
-    plt.xticks(x, labels)
-    plt.title("Energy Variance Comparison")
-    plt.ylabel("Variance")
-    plt.show()
+from config.config import ALPHA, ALPHA_VALUES, NUM_ENERGY_NODES, NUM_TRAFFIC_NODES, W1, W2, get_runtime_settings, is_dev_mode
+from graph.graph_builder import SmartCityGraph
+from simulation.digital_twin import ExperimentContext
+from utils.helpers import ProgressTracker, StageTimer
 
-if __name__ == "__main__":    
-    results = {
-        "Traffic-only": run_scenario(alpha=0),
-        "Energy-only": run_scenario(alpha=0),
-        "Cross-domain": run_scenario(alpha=ALPHA),
-        "Ablation": run_scenario(alpha=0)
+
+def summarize_result(simulation_output, optimization_output):
+    raw_history = simulation_output["raw_history"]
+    return {
+        "pre_optimization": {
+            "travel_time": float(np.mean([item["travel_time"] for item in raw_history])),
+            "energy_variance": float(np.mean([item["energy_variance"] for item in raw_history])),
+        },
+        "post_optimization": {
+            "travel_time": optimization_output["travel_time"],
+            "energy_variance": optimization_output["energy_variance"],
+        },
+        "pareto_front": optimization_output["pareto_front"],
+        "losses": simulation_output["losses"],
+        "diagnostics": simulation_output["diagnostics"],
     }
-    
-    print("\n===== RESULTS =====")
-    for k, v in results.items():
-        print(f"{k}: Travel Time={v[0]:.2f}, Energy Var={v[1]:.2f}")
-    
-    # ✅ ADD THIS (IMPROVEMENT TABLE)
-    baseline = results["Traffic-only"]
 
-    print("\n===== % IMPROVEMENT OVER TRAFFIC-ONLY =====")
 
-    for k, v in results.items():
-        travel_improve = ((baseline[0] - v[0]) / baseline[0]) * 100
-        energy_diff = v[1] - baseline[1]
+def validate_results(results):
+    scenario_results = results["scenarios"]
+    cross_domain = scenario_results["Cross-domain"]["post_optimization"]
+    traffic_only = scenario_results["Traffic-only"]["post_optimization"]
 
-        print(f"{k}: Travel Δ={travel_improve:.2f}%, Energy Δ={energy_diff:.3f}")
-    
-    # ✅ ADD THIS (PLOTS)
-    plot_results(results)
+    for name, values in scenario_results.items():
+        metrics = values["post_optimization"]
+        if metrics["travel_time"] < 0 or metrics["energy_variance"] < 0:
+            raise ValueError(f"{name} produced negative metrics")
+        if np.isnan(metrics["travel_time"]) or np.isnan(metrics["energy_variance"]):
+            raise ValueError(f"{name} produced NaN metrics")
+
+        for loss in values["losses"]:
+            if np.isnan(loss):
+                raise ValueError(f"{name} produced NaN training loss")
+
+        for item in values["diagnostics"]:
+            if item["traffic_min"] < 0 or item["energy_min"] < 0:
+                raise ValueError(f"{name} produced negative traffic or energy")
+
+    if not cross_domain["energy_variance"] > 0:
+        raise ValueError("Cross-domain energy variance should be positive")
+
+    return {
+        "cross_domain_beats_traffic_on_travel": cross_domain["travel_time"] < traffic_only["travel_time"],
+        "cross_domain_has_higher_energy_variance": cross_domain["energy_variance"] > traffic_only["energy_variance"],
+        "all_losses_decrease": {
+            name: values["losses"][-1] <= values["losses"][0]
+            for name, values in scenario_results.items()
+        },
+    }
+
+
+def main():
+    runtime = get_runtime_settings()
+    graph = SmartCityGraph(NUM_TRAFFIC_NODES, NUM_ENERGY_NODES)
+    context = ExperimentContext(graph)
+    timer = StageTimer()
+
+    scenario_specs = {
+        "Traffic-only": {
+            "model_kind": "stgcn",
+            "alpha": ALPHA,
+            "w1": 0.35,
+            "w2": 0.65,
+            "max_energy_shift": 0.35,
+        },
+        "Energy-only": {
+            "model_kind": "cross_domain",
+            "alpha": ALPHA,
+            "w1": 0.15,
+            "w2": 0.85,
+            "max_energy_shift": 0.35,
+        },
+        "Cross-domain": {
+            "model_kind": "cross_domain",
+            "alpha": ALPHA,
+            "w1": W1,
+            "w2": W2,
+            "max_energy_shift": 1.0,
+        },
+        "Ablation": {
+            "model_kind": "cross_domain",
+            "alpha": ALPHA,
+            "w1": 0.55,
+            "w2": 0.45,
+            "max_energy_shift": 0.6,
+        },
+    }
+    benchmark_specs = {
+        "LSTM": {
+            "model_kind": "lstm",
+            "scenario_name": "Traffic-only",
+            "alpha": ALPHA,
+            "w1": W1,
+            "w2": W2,
+            "max_energy_shift": 0.35,
+        },
+        "STGCN": {
+            "model_kind": "stgcn",
+            "scenario_name": "Traffic-only",
+            "alpha": ALPHA,
+            "w1": W1,
+            "w2": W2,
+            "max_energy_shift": 0.35,
+        },
+        "Cross-domain GNN": {
+            "model_kind": "cross_domain",
+            "scenario_name": "Cross-domain",
+            "alpha": ALPHA,
+            "w1": W1,
+            "w2": W2,
+            "max_energy_shift": 1.0,
+        },
+    }
+
+    total_progress_steps = 3 + (len(scenario_specs) * 2) + (len(ALPHA_VALUES) * 2) + (len(benchmark_specs) * 2) + 1
+    progress = ProgressTracker(total_progress_steps)
+
+    trained_models = {}
+    for model_kind in ("lstm", "stgcn", "cross_domain"):
+        progress.advance("Training model", f"(Model: {model_kind})")
+        with timer.time_block(f"train_{model_kind}"):
+            trained_models[model_kind] = context.train_model(model_kind)[1]
+
+    scenarios = {}
+    for name, spec in scenario_specs.items():
+        progress.advance("Running simulation", f"(Scenario: {name})")
+        with timer.time_block(f"simulate_{name}"):
+            simulation_output = context.simulate_scenario(
+                scenario_name=name,
+                model_kind=spec["model_kind"],
+                alpha=spec["alpha"],
+                steps=runtime["time_steps"],
+            )
+
+        progress.advance("Running NSGA-II optimization", f"(Scenario: {name})")
+        with timer.time_block(f"optimize_{name}"):
+            optimization_output = context.optimize_scenario(
+                simulation_output,
+                w1=spec["w1"],
+                w2=spec["w2"],
+                max_energy_shift=spec.get("max_energy_shift"),
+            )
+        scenarios[name] = summarize_result(simulation_output, optimization_output)
+
+    sensitivity = {}
+    for alpha in ALPHA_VALUES:
+        progress.advance("Sensitivity analysis", f"(alpha={alpha})")
+        with timer.time_block(f"sensitivity_sim_{alpha}"):
+            simulation_output = context.simulate_scenario(
+                scenario_name="Cross-domain",
+                model_kind="cross_domain",
+                alpha=alpha,
+                steps=runtime["time_steps"],
+            )
+
+        progress.advance("Running NSGA-II optimization", f"(Sensitivity alpha={alpha})")
+        with timer.time_block(f"sensitivity_opt_{alpha}"):
+            optimization_output = context.optimize_scenario(
+                simulation_output,
+                w1=W1,
+                w2=W2,
+                max_energy_shift=1.0,
+            )
+
+        sensitivity[str(alpha)] = {
+            "travel_time": optimization_output["travel_time"],
+            "energy_variance": optimization_output["energy_variance"],
+        }
+
+    benchmark = {}
+    for label, spec in benchmark_specs.items():
+        progress.advance("Benchmarking", f"(Model: {label})")
+        with timer.time_block(f"benchmark_sim_{label}"):
+            simulation_output = context.simulate_scenario(
+                scenario_name=spec["scenario_name"],
+                model_kind=spec["model_kind"],
+                alpha=spec["alpha"],
+                steps=runtime["time_steps"],
+            )
+
+        progress.advance("Running NSGA-II optimization", f"(Benchmark: {label})")
+        with timer.time_block(f"benchmark_opt_{label}"):
+            optimization_output = context.optimize_scenario(
+                simulation_output,
+                w1=spec["w1"],
+                w2=spec["w2"],
+                max_energy_shift=spec.get("max_energy_shift"),
+            )
+
+        benchmark[label] = {
+            "mae": context.evaluate_prediction_mae(spec["model_kind"]),
+            "travel_time": optimization_output["travel_time"],
+            "energy_variance": optimization_output["energy_variance"],
+        }
+
+    results = {
+        "mode": "dev" if is_dev_mode() else "full",
+        "scenarios": scenarios,
+        "sensitivity_analysis": sensitivity,
+        "model_comparison": benchmark,
+        "timings": {name: round(value, 4) for name, value in sorted(timer.timings.items(), key=lambda item: item[1], reverse=True)},
+        "training_loss_logs": {name: [float(item) for item in losses] for name, losses in trained_models.items()},
+    }
+    results["validation"] = validate_results(results)
+
+    progress.advance("Generating results")
+    Path("results.json").write_text(json.dumps(results, indent=2), encoding="utf-8")
+
+    print("\n===== MODE =====")
+    print("DEV_MODE" if is_dev_mode() else "FULL_MODE")
+
+    print("\n===== SCENARIO RESULTS =====")
+    for name, values in scenarios.items():
+        metrics = values["post_optimization"]
+        print(f"{name}: Travel Time={metrics['travel_time']:.4f}, Energy Variance={metrics['energy_variance']:.4f}")
+
+    print("\n===== VALIDATION =====")
+    for key, value in results["validation"].items():
+        print(f"{key}: {value}")
+
+    print("\n===== BOTTLENECKS =====")
+    for name, value in list(results["timings"].items())[:5]:
+        print(f"{name}: {value:.2f}s")
+
+    print("[100%] Completed")
+
+
+if __name__ == "__main__":
+    main()

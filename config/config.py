@@ -1,12 +1,53 @@
-# Global configuration for experiment
+# Global configuration for the smart-city digital twin experiments.
 
 NUM_TRAFFIC_NODES = 10
 NUM_ENERGY_NODES = 4
 
-ALPHA = 0.3  # EV penetration rate
+RANDOM_SEED = 7
+DATA_PATH = "data/metr_la.npz"
 
-TIME_STEPS = 20
+DEV_MODE = True
 
-# Optimization weights
-W1 = 0.5  # traffic importance
-W2 = 0.5  # energy importance
+SEQUENCE_LENGTH = 6
+TRAIN_SPLIT = 0.8
+LEARNING_RATE = 0.003
+GRAD_CLIP = 1.0
+
+TRAINING_ALPHA = 0.3
+ALPHA = 0.3
+ALPHA_VALUES = [0.1, 0.3, 0.5, 0.7]
+
+# Scenario selection weights for the Pareto set.
+W1 = 0.85  # travel-time importance
+W2 = 0.15  # energy-variance importance
+
+MAX_TRAFFIC_REDUCTION = 0.4
+MAX_ENERGY_SHIFT = 0.6
+
+DEV_SETTINGS = {
+    "train_epochs": 4,
+    "time_steps": 12,
+    "sample_limit": 320,
+    "nsga2_population": 10,
+    "nsga2_generations": 5,
+}
+
+FULL_SETTINGS = {
+    "train_epochs": 8,
+    "time_steps": 40,
+    "sample_limit": None,
+    "nsga2_population": 40,
+    "nsga2_generations": 30,
+}
+
+
+def get_runtime_settings():
+    return DEV_SETTINGS if is_dev_mode() else FULL_SETTINGS
+
+
+def is_dev_mode():
+    override = os.getenv("DIGITAL_TWIN_DEV_MODE")
+    if override is None:
+        return DEV_MODE
+    return override.lower() not in {"0", "false", "full"}
+import os

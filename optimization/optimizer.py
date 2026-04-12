@@ -1,59 +1,73 @@
 import numpy as np
 
+from config.config import MAX_ENERGY_SHIFT, MAX_TRAFFIC_REDUCTION, RANDOM_SEED
+from optimization.nsga2 import run_nsga2
+
+
 class Optimizer:
-    def __init__(self, graph, w1=0.5, w2=0.5):
+    def __init__(self, graph):
         self.graph = graph
-        self.w1 = w1
-        self.w2 = w2
-    
-    def optimize(self, traffic_flow, energy_demand):
-    
-        avg_flow = np.mean(list(traffic_flow.values()))
-        avg_energy = np.mean(list(energy_demand.values()))
-        
-        # measure imbalance
-        energy_variance = np.var(list(energy_demand.values()))
-        
-        # --- ENERGY-AWARE TRAFFIC CONTROL ---
-        adjusted_traffic = {}
 
-        for t in self.graph.traffic_nodes:
-            v = traffic_flow[t]
-            
-            connected_energy = [
-                nbr for nbr in self.graph.get_neighbors(t)
-                if nbr in energy_demand
-            ]
-            
-            overload_factor = sum(
-                1 for e in connected_energy if energy_demand[e] > avg_energy
-            )
-            
-            # penalty based on energy stress
-            penalty = min(0.2, energy_variance / (avg_energy + 1e-6))
-            
-            if v > avg_flow:
-                reduction = 0.75 - 0.08 * overload_factor + penalty
-                reduction = min(0.95, max(0.6, reduction))
-            else:
-                reduction = 0.9
-            
-            adjusted_traffic[t] = v * reduction
+    def optimize(
+        self,
+        traffic_flow,
+        energy_demand,
+        w1,
+        w2,
+        population_size,
+        generations,
+        max_traffic_reduction=None,
+        max_energy_shift=None,
+    ):
+        traffic_nodes = list(traffic_flow.keys())
+        energy_nodes = list(energy_demand.keys())
+        traffic_values = np.array([traffic_flow[node] for node in traffic_nodes], dtype=np.float32)
+        energy_values = np.array([energy_demand[node] for node in energy_nodes], dtype=np.float32)
 
-        # --- REALISTIC ENERGY BALANCING ---
-        # --- STRONGER ENERGY BALANCING ---
+        decisions, objectives = run_nsga2(
+            traffic_flow=traffic_values,
+            energy_demand=energy_values,
+            population_size=population_size,
+            generations=generations,
+            seed=RANDOM_SEED,
+            max_traffic_reduction=MAX_TRAFFIC_REDUCTION if max_traffic_reduction is None else max_traffic_reduction,
+            max_energy_shift=MAX_ENERGY_SHIFT if max_energy_shift is None else max_energy_shift,
+        )
+
+        if decisions is None or objectives is None or len(decisions) == 0:
+            raise RuntimeError("NSGA-II failed to return candidate solutions")
+
+        normalized = objectives.copy()
+        for column in range(normalized.shape[1]):
+            col = normalized[:, column]
+            span = max(1e-6, float(col.max() - col.min()))
+            normalized[:, column] = (col - col.min()) / span
+
+        score = w1 * normalized[:, 0] + w2 * normalized[:, 1]
+        best_index = int(np.argmin(score))
+        best_decision = decisions[best_index]
+
+        n_traffic = len(traffic_nodes)
+        traffic_scale = best_decision[:n_traffic]
+        energy_scale = best_decision[n_traffic:]
+
+        adjusted_traffic = {
+            node: max(0.0, float(value * scale))
+            for node, value, scale in zip(traffic_nodes, traffic_values, traffic_scale)
+        }
+
+        avg_energy = float(np.mean(energy_values))
         adjusted_energy = {}
+        for node, value, scale in zip(energy_nodes, energy_values, energy_scale):
+            centered = value - avg_energy
+            adjusted_energy[node] = max(0.0, float(avg_energy + centered * scale))
 
-        for e, v in energy_demand.items():
-            # stronger pull toward average
-            balanced = 0.5 * v + 0.5 * avg_energy
-            
-            # slightly reduce peaks
-            if v > avg_energy:
-                balanced *= 0.9
-            
-            # small noise
-            balanced += np.random.normal(0, 0.01 * avg_energy)
-            
-            adjusted_energy[e] = max(0, balanced)
-        return adjusted_traffic, adjusted_energy
+        pareto_front = [
+            {
+                "travel_time": float(travel),
+                "energy_variance": float(variance),
+            }
+            for travel, variance in objectives
+        ]
+
+        return adjusted_traffic, adjusted_energy, pareto_front
