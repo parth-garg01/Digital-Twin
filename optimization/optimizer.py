@@ -1,6 +1,6 @@
 import numpy as np
 
-from config.config import MAX_ENERGY_SHIFT, MAX_TRAFFIC_REDUCTION, RANDOM_SEED
+from config.config import RANDOM_SEED
 from optimization.nsga2 import run_nsga2
 
 
@@ -16,8 +16,8 @@ class Optimizer:
         w2,
         population_size,
         generations,
-        max_traffic_reduction=None,
-        max_energy_shift=None,
+        traffic_delta_bounds,
+        energy_delta_bounds,
     ):
         traffic_nodes = list(traffic_flow.keys())
         energy_nodes = list(energy_demand.keys())
@@ -30,8 +30,8 @@ class Optimizer:
             population_size=population_size,
             generations=generations,
             seed=RANDOM_SEED,
-            max_traffic_reduction=MAX_TRAFFIC_REDUCTION if max_traffic_reduction is None else max_traffic_reduction,
-            max_energy_shift=MAX_ENERGY_SHIFT if max_energy_shift is None else max_energy_shift,
+            traffic_delta_bounds=traffic_delta_bounds,
+            energy_delta_bounds=energy_delta_bounds,
         )
 
         if decisions is None or objectives is None or len(decisions) == 0:

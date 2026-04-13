@@ -71,28 +71,32 @@ def main():
             "alpha": ALPHA,
             "w1": 0.35,
             "w2": 0.65,
-            "max_energy_shift": 0.35,
+            "traffic_delta_bounds": (-0.1, 0.1),
+            "energy_delta_bounds": (-0.1, 0.1),
         },
         "Energy-only": {
             "model_kind": "cross_domain",
             "alpha": ALPHA,
             "w1": 0.15,
             "w2": 0.85,
-            "max_energy_shift": 0.35,
+            "traffic_delta_bounds": (-0.1, 0.1),
+            "energy_delta_bounds": (-0.1, 0.1),
         },
         "Cross-domain": {
             "model_kind": "cross_domain",
             "alpha": ALPHA,
             "w1": W1,
             "w2": W2,
-            "max_energy_shift": 1.0,
+            "traffic_delta_bounds": (-0.2, 0.2),
+            "energy_delta_bounds": (-0.5, 0.5),
         },
         "Ablation": {
             "model_kind": "cross_domain",
             "alpha": ALPHA,
             "w1": 0.55,
             "w2": 0.45,
-            "max_energy_shift": 0.6,
+            "traffic_delta_bounds": (-0.1, 0.1),
+            "energy_delta_bounds": (-0.1, 0.1),
         },
     }
     benchmark_specs = {
@@ -102,7 +106,8 @@ def main():
             "alpha": ALPHA,
             "w1": W1,
             "w2": W2,
-            "max_energy_shift": 0.35,
+            "traffic_delta_bounds": (-0.1, 0.1),
+            "energy_delta_bounds": (-0.1, 0.1),
         },
         "STGCN": {
             "model_kind": "stgcn",
@@ -110,7 +115,8 @@ def main():
             "alpha": ALPHA,
             "w1": W1,
             "w2": W2,
-            "max_energy_shift": 0.35,
+            "traffic_delta_bounds": (-0.1, 0.1),
+            "energy_delta_bounds": (-0.1, 0.1),
         },
         "Cross-domain GNN": {
             "model_kind": "cross_domain",
@@ -118,7 +124,8 @@ def main():
             "alpha": ALPHA,
             "w1": W1,
             "w2": W2,
-            "max_energy_shift": 1.0,
+            "traffic_delta_bounds": (-0.2, 0.2),
+            "energy_delta_bounds": (-0.5, 0.5),
         },
     }
 
@@ -148,7 +155,8 @@ def main():
                 simulation_output,
                 w1=spec["w1"],
                 w2=spec["w2"],
-                max_energy_shift=spec.get("max_energy_shift"),
+                traffic_delta_bounds=spec["traffic_delta_bounds"],
+                energy_delta_bounds=spec["energy_delta_bounds"],
             )
         scenarios[name] = summarize_result(simulation_output, optimization_output)
 
@@ -169,7 +177,8 @@ def main():
                 simulation_output,
                 w1=W1,
                 w2=W2,
-                max_energy_shift=1.0,
+                traffic_delta_bounds=(-0.2, 0.2),
+                energy_delta_bounds=(-0.5, 0.5),
             )
 
         sensitivity[str(alpha)] = {
@@ -194,7 +203,8 @@ def main():
                 simulation_output,
                 w1=spec["w1"],
                 w2=spec["w2"],
-                max_energy_shift=spec.get("max_energy_shift"),
+                traffic_delta_bounds=spec["traffic_delta_bounds"],
+                energy_delta_bounds=spec["energy_delta_bounds"],
             )
 
         benchmark[label] = {

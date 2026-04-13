@@ -7,77 +7,29 @@
         "energy_variance": 32.97266574068099
       },
       "post_optimization": {
-        "travel_time": 39.11889389695697,
-        "energy_variance": 13.906233868964781
+        "travel_time": 56.197233109419926,
+        "energy_variance": 25.85665685515163
       },
       "pareto_front": [
         {
-          "travel_time": 39.424065923794906,
-          "energy_variance": 13.845374417811444
+          "travel_time": 56.310368906958026,
+          "energy_variance": 25.856627611853504
         },
         {
-          "travel_time": 39.736823555727916,
-          "energy_variance": 13.813730894461045
+          "travel_time": 56.197233109419926,
+          "energy_variance": 25.85665685515163
         },
         {
-          "travel_time": 39.95527087219131,
-          "energy_variance": 13.796169768164491
+          "travel_time": 56.137012658647905,
+          "energy_variance": 26.737130970737
         },
         {
-          "travel_time": 38.838204895711606,
-          "energy_variance": 14.400106828143478
+          "travel_time": 56.31531745390811,
+          "energy_variance": 25.82438549630522
         },
         {
-          "travel_time": 39.97304996965255,
-          "energy_variance": 13.768521728626492
-        },
-        {
-          "travel_time": 38.76197682373051,
-          "energy_variance": 14.683133457455734
-        },
-        {
-          "travel_time": 40.10407925820652,
-          "energy_variance": 13.750341650051734
-        },
-        {
-          "travel_time": 40.34379707333677,
-          "energy_variance": 13.748730620384476
-        },
-        {
-          "travel_time": 39.37272303795389,
-          "energy_variance": 13.874038463344743
-        },
-        {
-          "travel_time": 39.06627038774654,
-          "energy_variance": 13.941881957594049
-        },
-        {
-          "travel_time": 40.41780416195254,
-          "energy_variance": 13.59113894603097
-        },
-        {
-          "travel_time": 39.88651968145474,
-          "energy_variance": 13.802648335976098
-        },
-        {
-          "travel_time": 39.11889389695697,
-          "energy_variance": 13.906233868964781
-        },
-        {
-          "travel_time": 38.972987022180575,
-          "energy_variance": 14.346131372273248
-        },
-        {
-          "travel_time": 39.441563709870856,
-          "energy_variance": 13.84464233259824
-        },
-        {
-          "travel_time": 39.825302369323126,
-          "energy_variance": 13.804373248799118
-        },
-        {
-          "travel_time": 39.04540694239155,
-          "energy_variance": 14.092510799316583
+          "travel_time": 56.50896888563485,
+          "energy_variance": 25.823102236256922
         }
       ],
       "losses": [
@@ -339,41 +291,45 @@
         "energy_variance": 37.72128851034729
       },
       "post_optimization": {
-        "travel_time": 38.91918295337914,
-        "energy_variance": 14.547901773889894
+        "travel_time": 57.345248893560566,
+        "energy_variance": 27.602614775356958
       },
       "pareto_front": [
         {
-          "travel_time": 39.21348016143371,
-          "energy_variance": 14.442678078042345
+          "travel_time": 58.37775213618154,
+          "energy_variance": 27.601767321274995
         },
         {
-          "travel_time": 38.91918295337914,
-          "energy_variance": 14.547901773889894
+          "travel_time": 57.07089522933677,
+          "energy_variance": 27.638857836926604
         },
         {
-          "travel_time": 38.97081300160332,
-          "energy_variance": 14.487363553618103
+          "travel_time": 57.21467965553935,
+          "energy_variance": 27.612188023973584
         },
         {
-          "travel_time": 39.20158798477408,
-          "energy_variance": 14.479088822369686
+          "travel_time": 58.451264880794454,
+          "energy_variance": 27.6014438886464
         },
         {
-          "travel_time": 38.799336453069664,
-          "energy_variance": 17.032798430832752
+          "travel_time": 57.241629958364115,
+          "energy_variance": 27.61146465413735
         },
         {
-          "travel_time": 38.812530476876915,
-          "energy_variance": 15.290829890876386
+          "travel_time": 57.19312884076324,
+          "energy_variance": 27.612791515047295
         },
         {
-          "travel_time": 38.79634254412774,
-          "energy_variance": 17.316647353361226
+          "travel_time": 57.345248893560566,
+          "energy_variance": 27.602614775356958
         },
         {
-          "travel_time": 38.835120643314724,
-          "energy_variance": 14.784781838748046
+          "travel_time": 56.99894005340752,
+          "energy_variance": 27.63921141981958
+        },
+        {
+          "travel_time": 56.84648429241189,
+          "energy_variance": 27.6481397195221
         }
       ],
       "losses": [
@@ -635,37 +591,25 @@
         "energy_variance": 28.494704777500978
       },
       "post_optimization": {
-        "travel_time": 38.923024748146034,
-        "energy_variance": 0.037597656996511304
+        "travel_time": 51.83695332329362,
+        "energy_variance": 7.022009293285588
       },
       "pareto_front": [
         {
-          "travel_time": 40.69520110504199,
-          "energy_variance": 0.008732260180874437
+          "travel_time": 51.92168262700481,
+          "energy_variance": 6.789325227900568
         },
         {
-          "travel_time": 39.48700824250352,
-          "energy_variance": 0.012421545637952459
+          "travel_time": 51.83695332329362,
+          "energy_variance": 7.022009293285588
         },
         {
-          "travel_time": 39.1804926533528,
-          "energy_variance": 0.029999710570056105
+          "travel_time": 52.07068001360775,
+          "energy_variance": 6.74108344891275
         },
         {
-          "travel_time": 38.923024748146034,
-          "energy_variance": 0.037597656996511304
-        },
-        {
-          "travel_time": 39.785993067934115,
-          "energy_variance": 0.010263723032526786
-        },
-        {
-          "travel_time": 39.511105431553105,
-          "energy_variance": 0.011110243130212282
-        },
-        {
-          "travel_time": 39.22609846441926,
-          "energy_variance": 0.028414857964393615
+          "travel_time": 51.89264656466567,
+          "energy_variance": 6.812548209554031
         }
       ],
       "losses": [
@@ -927,49 +871,69 @@
         "energy_variance": 25.80650694334314
       },
       "post_optimization": {
-        "travel_time": 38.525304681437355,
-        "energy_variance": 4.4322710397933225
+        "travel_time": 57.18511942569594,
+        "energy_variance": 20.100477912079377
       },
       "pareto_front": [
         {
-          "travel_time": 39.26304409674112,
-          "energy_variance": 4.140215681106023
+          "travel_time": 57.72700949169498,
+          "energy_variance": 19.876433801229968
         },
         {
-          "travel_time": 38.525304681437355,
-          "energy_variance": 4.4322710397933225
+          "travel_time": 57.38941931013228,
+          "energy_variance": 19.907154865768895
         },
         {
-          "travel_time": 38.4218625091668,
-          "energy_variance": 5.287193107398705
+          "travel_time": 57.69507816429096,
+          "energy_variance": 19.878781891578733
         },
         {
-          "travel_time": 38.4267123192705,
-          "energy_variance": 5.287173248313417
+          "travel_time": 57.74173281246899,
+          "energy_variance": 19.872605757770636
         },
         {
-          "travel_time": 39.01321969110722,
-          "energy_variance": 4.141075224188863
+          "travel_time": 57.50484343789948,
+          "energy_variance": 19.896786635589304
         },
         {
-          "travel_time": 38.90910950086045,
-          "energy_variance": 4.171851162652976
+          "travel_time": 57.36056061290803,
+          "energy_variance": 19.9858667411566
         },
         {
-          "travel_time": 38.4897819795174,
-          "energy_variance": 4.758105485962215
+          "travel_time": 57.3370297711986,
+          "energy_variance": 20.002108804549685
         },
         {
-          "travel_time": 39.291375011748116,
-          "energy_variance": 4.097563762189173
+          "travel_time": 57.30047924247971,
+          "energy_variance": 20.02186881268203
         },
         {
-          "travel_time": 38.445256979778584,
-          "energy_variance": 4.932517801843952
+          "travel_time": 57.29094476145044,
+          "energy_variance": 20.039805769340845
         },
         {
-          "travel_time": 38.60677850239421,
-          "energy_variance": 4.404915674584815
+          "travel_time": 57.385423185227886,
+          "energy_variance": 19.96290919338196
+        },
+        {
+          "travel_time": 57.59053460958506,
+          "energy_variance": 19.88407288091279
+        },
+        {
+          "travel_time": 57.75156299906897,
+          "energy_variance": 19.868921655691217
+        },
+        {
+          "travel_time": 57.43013367983529,
+          "energy_variance": 19.90659145648006
+        },
+        {
+          "travel_time": 57.18511942569594,
+          "energy_variance": 20.100477912079377
+        },
+        {
+          "travel_time": 57.18255867060846,
+          "energy_variance": 20.532661729064664
         }
       ],
       "losses": [
@@ -1228,65 +1192,65 @@
   },
   "sensitivity_analysis": {
     "0.1": {
-      "travel_time": 38.353888465713325,
-      "energy_variance": 0.023802697372345076
+      "travel_time": 51.50892930158709,
+      "energy_variance": 3.2128721725899125
     },
     "0.3": {
-      "travel_time": 38.923024748146034,
-      "energy_variance": 0.037597656996511304
+      "travel_time": 51.83695332329362,
+      "energy_variance": 7.022009293285588
     },
     "0.5": {
-      "travel_time": 38.800692348264946,
-      "energy_variance": 0.004702264540737102
+      "travel_time": 51.849119091798045,
+      "energy_variance": 11.76664492963473
     },
     "0.7": {
-      "travel_time": 39.09199212768126,
-      "energy_variance": 0.10866632544222772
+      "travel_time": 51.874230584888835,
+      "energy_variance": 20.450568254831087
     }
   },
   "model_comparison": {
     "LSTM": {
       "mae": 2.775160074234009,
-      "travel_time": 37.3383357802076,
-      "energy_variance": 12.589405675803512
+      "travel_time": 54.694755873505585,
+      "energy_variance": 23.25679841625537
     },
     "STGCN": {
       "mae": 5.594384670257568,
-      "travel_time": 38.76197682373051,
-      "energy_variance": 14.683133457455734
+      "travel_time": 56.197233109419926,
+      "energy_variance": 25.85665685515163
     },
     "Cross-domain GNN": {
       "mae": 5.694202423095703,
-      "travel_time": 38.923024748146034,
-      "energy_variance": 0.037597656996511304
+      "travel_time": 51.83695332329362,
+      "energy_variance": 7.022009293285588
     }
   },
   "timings": {
-    "train_stgcn": 159.8241,
-    "train_cross_domain": 114.5473,
-    "train_lstm": 83.1938,
-    "optimize_Ablation": 0.1766,
-    "optimize_Cross-domain": 0.1505,
-    "sensitivity_opt_0.7": 0.1343,
-    "benchmark_opt_STGCN": 0.1343,
-    "optimize_Traffic-only": 0.1322,
-    "benchmark_opt_LSTM": 0.1319,
-    "sensitivity_opt_0.3": 0.1306,
-    "optimize_Energy-only": 0.128,
-    "benchmark_opt_Cross-domain GNN": 0.1277,
-    "sensitivity_opt_0.5": 0.1277,
-    "sensitivity_opt_0.1": 0.1259,
-    "simulate_Ablation": 0.0522,
-    "simulate_Traffic-only": 0.0464,
-    "sensitivity_sim_0.5": 0.0464,
-    "simulate_Energy-only": 0.0457,
-    "sensitivity_sim_0.1": 0.0456,
-    "sensitivity_sim_0.7": 0.0453,
-    "benchmark_sim_Cross-domain GNN": 0.0442,
-    "sensitivity_sim_0.3": 0.0423,
-    "benchmark_sim_STGCN": 0.0412,
-    "simulate_Cross-domain": 0.0398,
-    "benchmark_sim_LSTM": 0.0271
+    "train_lstm": 0.7365,
+    "train_cross_domain": 0.5874,
+    "train_stgcn": 0.5267,
+    "benchmark_opt_LSTM": 0.2737,
+    "optimize_Energy-only": 0.2704,
+    "optimize_Cross-domain": 0.2569,
+    "optimize_Traffic-only": 0.2488,
+    "sensitivity_opt_0.5": 0.2372,
+    "optimize_Ablation": 0.2345,
+    "sensitivity_opt_0.1": 0.2317,
+    "benchmark_opt_STGCN": 0.2298,
+    "sensitivity_opt_0.3": 0.2266,
+    "benchmark_opt_Cross-domain GNN": 0.2263,
+    "sensitivity_opt_0.7": 0.2173,
+    "simulate_Traffic-only": 0.1171,
+    "sensitivity_sim_0.7": 0.082,
+    "simulate_Energy-only": 0.0815,
+    "sensitivity_sim_0.5": 0.0783,
+    "simulate_Cross-domain": 0.0776,
+    "sensitivity_sim_0.3": 0.0717,
+    "simulate_Ablation": 0.0705,
+    "sensitivity_sim_0.1": 0.0687,
+    "benchmark_sim_STGCN": 0.0683,
+    "benchmark_sim_Cross-domain GNN": 0.0664,
+    "benchmark_sim_LSTM": 0.0316
   },
   "training_loss_logs": {
     "lstm": [

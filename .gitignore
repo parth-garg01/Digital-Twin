@@ -1,6 +1,7 @@
 venv/
 .venv/
 .tmp/
+artifacts/
 __pycache__/
 *.py[cod]
 *.pyo

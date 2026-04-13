@@ -1,3 +1,5 @@
+import os
+
 # Global configuration for the smart-city digital twin experiments.
 
 NUM_TRAFFIC_NODES = 10
@@ -5,6 +7,7 @@ NUM_ENERGY_NODES = 4
 
 RANDOM_SEED = 7
 DATA_PATH = "data/metr_la.npz"
+MODEL_CACHE_DIR = "artifacts/models"
 
 DEV_MODE = True
 
@@ -20,9 +23,6 @@ ALPHA_VALUES = [0.1, 0.3, 0.5, 0.7]
 # Scenario selection weights for the Pareto set.
 W1 = 0.85  # travel-time importance
 W2 = 0.15  # energy-variance importance
-
-MAX_TRAFFIC_REDUCTION = 0.4
-MAX_ENERGY_SHIFT = 0.6
 
 DEV_SETTINGS = {
     "train_epochs": 4,
@@ -50,4 +50,3 @@ def is_dev_mode():
     if override is None:
         return DEV_MODE
     return override.lower() not in {"0", "false", "full"}
-import os
