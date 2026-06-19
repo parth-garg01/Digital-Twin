@@ -65,22 +65,25 @@ def main():
     context = ExperimentContext(graph)
     timer = StageTimer()
 
+    # All scenarios use identical optimizer settings (w1, w2, bounds) so that
+    # differences in results are attributable only to the model and input data,
+    # not to the optimization objective or search range.
     scenario_specs = {
         "Traffic-only": {
             "model_kind": "stgcn",
             "alpha": ALPHA,
-            "w1": 0.35,
-            "w2": 0.65,
-            "traffic_delta_bounds": (-0.1, 0.1),
-            "energy_delta_bounds": (-0.1, 0.1),
+            "w1": W1,
+            "w2": W2,
+            "traffic_delta_bounds": (-0.2, 0.2),
+            "energy_delta_bounds": (-0.2, 0.2),
         },
         "Energy-only": {
             "model_kind": "cross_domain",
             "alpha": ALPHA,
-            "w1": 0.15,
-            "w2": 0.85,
-            "traffic_delta_bounds": (-0.1, 0.1),
-            "energy_delta_bounds": (-0.1, 0.1),
+            "w1": W1,
+            "w2": W2,
+            "traffic_delta_bounds": (-0.2, 0.2),
+            "energy_delta_bounds": (-0.2, 0.2),
         },
         "Cross-domain": {
             "model_kind": "cross_domain",
@@ -88,15 +91,15 @@ def main():
             "w1": W1,
             "w2": W2,
             "traffic_delta_bounds": (-0.2, 0.2),
-            "energy_delta_bounds": (-0.5, 0.5),
+            "energy_delta_bounds": (-0.2, 0.2),
         },
         "Ablation": {
             "model_kind": "cross_domain",
             "alpha": ALPHA,
-            "w1": 0.55,
-            "w2": 0.45,
-            "traffic_delta_bounds": (-0.1, 0.1),
-            "energy_delta_bounds": (-0.1, 0.1),
+            "w1": W1,
+            "w2": W2,
+            "traffic_delta_bounds": (-0.2, 0.2),
+            "energy_delta_bounds": (-0.2, 0.2),
         },
     }
     benchmark_specs = {

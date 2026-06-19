@@ -41,3 +41,10 @@ class RealTrafficLoader:
 
     def denormalize_traffic(self, values):
         return values * self.std.squeeze(0) + self.mean.squeeze(0)
+
+    def compute_correlation_adjacency(self, threshold=0.5):
+        """Pearson correlation adjacency for the selected traffic nodes."""
+        corr = np.corrcoef(self.raw_traffic.T)  # (num_nodes, num_nodes)
+        adj = (corr > threshold).astype(np.float32)
+        np.fill_diagonal(adj, 0)
+        return adj

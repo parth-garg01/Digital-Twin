@@ -43,6 +43,23 @@ class SmartCityGraph:
             for traffic_node in traffic_choices[: min(3, len(traffic_choices))]:
                 self.G.add_edge(traffic_node, energy_node, type="cross")
 
+    def update_traffic_edges(self, adjacency_matrix):
+        """Replace synthetic traffic edges with data-derived ones from a correlation matrix."""
+        to_remove = [(u, v) for u, v, d in self.G.edges(data=True) if d.get("type") == "traffic"]
+        self.G.remove_edges_from(to_remove)
+
+        added = 0
+        for i, node_i in enumerate(self.traffic_nodes):
+            for j, node_j in enumerate(self.traffic_nodes):
+                if i < j and adjacency_matrix[i, j] > 0:
+                    self.G.add_edge(node_i, node_j, type="traffic", weight=float(adjacency_matrix[i, j]))
+                    added += 1
+
+        # Fallback: if correlation produces no edges, keep a minimal chain
+        if added == 0:
+            for i in range(len(self.traffic_nodes) - 1):
+                self.G.add_edge(self.traffic_nodes[i], self.traffic_nodes[i + 1], type="traffic")
+
     def get_neighbors(self, node, edge_type=None):
         neighbors = []
         for neighbor in self.G.neighbors(node):

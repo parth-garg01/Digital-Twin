@@ -5,6 +5,9 @@ import os
 NUM_TRAFFIC_NODES = 10
 NUM_ENERGY_NODES = 4
 
+CACHE_VERSION = 2  # Bump when model architecture or training data format changes
+ADJ_CORRELATION_THRESHOLD = 0.5  # Pearson correlation threshold for data-driven traffic graph
+
 RANDOM_SEED = 7
 DATA_PATH = "data/metr_la.npz"
 MODEL_CACHE_DIR = "artifacts/models"

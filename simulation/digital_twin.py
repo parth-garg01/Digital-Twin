@@ -5,6 +5,8 @@ import numpy as np
 import torch
 
 from config.config import (
+    ADJ_CORRELATION_THRESHOLD,
+    CACHE_VERSION,
     DATA_PATH,
     GRAD_CLIP,
     LEARNING_RATE,
@@ -32,6 +34,8 @@ class ExperimentContext:
         self._set_seed(RANDOM_SEED)
 
         self.loader = RealTrafficLoader(DATA_PATH, len(graph.traffic_nodes))
+        adj = self.loader.compute_correlation_adjacency(ADJ_CORRELATION_THRESHOLD)
+        self.graph.update_traffic_edges(adj)
         self.optimizer = Optimizer(graph)
         self._bundle_cache = {}
         self._model_cache = {}
@@ -85,7 +89,7 @@ class ExperimentContext:
             energy_target = norm_energy[index]
 
             if model_kind == "cross_domain":
-                energy_window = np.zeros((len(self.graph.energy_nodes), SEQUENCE_LENGTH), dtype=np.float32)
+                energy_window = norm_energy[index - SEQUENCE_LENGTH : index].T  # (energy_nodes, sequence_length)
                 sample = np.concatenate([traffic_window, energy_window], axis=0)
                 target = np.concatenate([traffic_target, energy_target], axis=0)
             else:
@@ -131,6 +135,7 @@ class ExperimentContext:
             "train_epochs": self.runtime["train_epochs"],
             "sample_limit": self.runtime["sample_limit"],
             "sequence_length": SEQUENCE_LENGTH,
+            "cache_version": CACHE_VERSION,
         }
 
         if model_kind == "lstm":
